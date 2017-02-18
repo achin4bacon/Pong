@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pong</title>
+<style>
+body{
+    background-image: url('https://staticdelivery.nexusmods.com/mods/110/images/53977-1-1399923376.jpg')
+}
+</style>
+</head>
+
+<body>
+    <canvas id="gameCanvas" width="800" height="600"> </canvas>
+    <script>
+        var canvas;
+        var canvasContext; //graphics information
+        var ballX = 50;
+        var ballSpeedX = 10;
+        var ballY = 100;
+        var ballSpeedY = 4;
+        //create left paddle
+        var paddle1Y = 250;
+        //create right paddle
+        var paddle2Y = 250;
+
+        var player1Score = 0;
+        var player2Score = 0;
+        ////////////////////////////
+        ///////MOVE STUFF /////////
+        ///////////////////////////
+        const PADDLE_HEIGHT = 100;
+        const PADDLE_WIDTH = 10;
+        ////////////////////////////
+        ///////DETECT MOUSE ///////
+        //////////////////////////
+        function calculateMousePos(evt) {
+            var rect = canvas.getBoundingClientRect();
+            var root = document.documentElement;
+            var mouseX = evt.clientX - rect.left - root.scrollLeft;
+            var mouseY = evt.clientY - rect.top - root.scrollTop;
+            return {
+                x: mouseX,
+                y: mouseY
+            };
+        }
+
+        window.onload = function () {
+            canvas = document.getElementById('gameCanvas');
+            canvasContext = canvas.getContext('2d');
+            var imageObj = new Image(); 
+
+            imageObj.onload = function(){
+                context.drawImage(imageObj, 69, 50);
+            };
+            imageObj.src = 'http://https://staticdelivery.nexusmods.com/mods/110/images/53977-1-1399923376.jpg';
+
+            var framesPerSecond = 30;
+            setInterval(function () {
+                moveEverything();
+                drawEverything();
+            },
+                1000 / framesPerSecond);
+            ;
+            canvas.addEventListener('mousemove',
+                function (evt) {
+                    var mousePos = calculateMousePos(evt);
+                    paddle1Y = mousePos.y - (PADDLE_HEIGHT / 2);
+                });
+        }
+        //////////////////////////////////
+        //////RIGHT PADDLE MOVEMENT///////
+        ///////////////////////////////////
+        function computerMovement() {
+            var paddle2YCenter = paddle2Y + (PADDLE_HEIGHT / 2);
+            if (paddle2YCenter < ballY - 35) {
+                paddle2Y += 6;
+            } else if (paddle2YCenter > ballY + 35) {
+                paddle2Y -= 6;
+            }
+        }
+
+        ////////////////////////////
+        ///////MOVE STUFF /////////
+        ///////////////////////////
+
+        function moveEverything() {
+            computerMovement();
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            if (ballX < 30) {
+                if (ballY > paddle1Y &&
+                    ballY < paddle1Y + PADDLE_HEIGHT) {
+                    ballSpeedX = -ballSpeedX;
+                    var deltaY = ballY - (paddle1Y + PADDLE_HEIGHT / 2)
+                    ballSpeedY = deltaY * .35;
+                } else {
+                    ballReset();
+                    player2Score++;
+                }
+            }
+            if (ballX > canvas.width - 30) {
+                if (ballY > paddle2Y &&
+                    ballY < paddle2Y + PADDLE_HEIGHT) {
+                    ballSpeedX = -ballSpeedX;
+                } else {
+                    ballReset();
+                    player1Score++;
+                };
+            }
+            if (ballY < 0) {
+                ballSpeedY = ballSpeedY * -1;
+            }
+            if (ballY > canvas.height) {
+                ballSpeedY = ballSpeedY * -1;
+            }
+        }
+
+        ////////////////////////////
+        ///////BALL RESET//////////
+        ///////////////////////////
+
+        function ballReset() {
+            ballSpeedX = ballSpeedX * -1;
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+        };
+
+        ////////////////////////////
+        ////DRAW EVERYTHING///////
+        ///////////////////////////
+
+        function drawEverything() {
+            ////////////////////////////
+            /////color everything///////
+            ///////////////////////////
+            colorRect(0, 0, canvas.width, canvas.height, 'black');//field
+            colorRect(10, paddle1Y, PADDLE_WIDTH, PADDLE_HEIGHT, 'white'); //left paddle
+            colorCircle(ballX, ballY, 10, 'white');//ball
+            colorRect(canvas.width - 20, paddle2Y, PADDLE_WIDTH, PADDLE_HEIGHT, 'white')//right paddle
+
+            ////////////////////////////
+            ///////score text/////////
+            ///////////////////////////
+            canvasContext.fillText(player1Score, 100, 100);
+            canvasContext.fillText(player2Score, canvas.width - 100, 100);
+        };
+        ////////////////////////////
+        ////////////ball////////////
+        ///////////////////////////
+        function colorCircle(centerX, centerY, radius, drawColor) {
+            canvasContext.fillStyle = 'drawColor';
+            canvasContext.beginPath();
+            canvasContext.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
+            canvasContext.fill();
+
+        };
+        ////////////////////////////
+        ///////paddles/////////
+        ///////////////////////////
+        function colorRect(leftX, topY, width, height, drawColor) {
+            canvasContext.fillStyle = drawColor;
+            canvasContext.fillRect(leftX, topY, width, height);
+
+        };
+    </script>
+</body>
+
+</html>
